@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sales Tech Workshop Hub</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Oswald:wght@500;600;700&display=swap">
+<style>
+
+:root{
+  --bg:#FBFBF8; --surface:#FFFFFF; --fg:#0E2B58; --muted:#4A5A78; --line:#E3E8F0;
+  --accent:#FFCB05; --on-accent:#0E2B58; --blue:#1B75B0; --good:#1E7A4C; --bad:#B3402F;
+  --good-bg:#E3F3EA; --bad-bg:#F8E6E2;
+  --display:'Oswald',Arial,sans-serif; --body:'Public Sans',Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0B1A30; --surface:#13294A; --fg:#EAF0FA; --muted:#A9B8D0; --line:#2A4470;
+  --blue:#8DB3F2; --good:#6FD0A0; --bad:#F0907F; --good-bg:#14382B; --bad-bg:#43211C; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0B1A30; --surface:#13294A; --fg:#EAF0FA; --muted:#A9B8D0; --line:#2A4470;
+  --blue:#8DB3F2; --good:#6FD0A0; --bad:#F0907F; --good-bg:#14382B; --bad-bg:#43211C; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.5 var(--body);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+.wrap{max-width:900px;margin:0 auto}
+header{padding-block:28px 16px}
+.eyebrow{font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin:0 0 6px}
+h1{font:700 clamp(30px,6vw,44px)/1.1 var(--display);margin:0;text-wrap:balance}
+header p{color:var(--muted);margin:10px 0 0;max-width:60ch}
+nav{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);display:flex;gap:8px;padding-block:10px;border-bottom:1px solid var(--line);z-index:5;flex-wrap:wrap}
+nav button{font:600 15px var(--body);padding:10px 16px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
+nav button[aria-selected="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+button:focus-visible,a:focus-visible,select:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+section.pane{padding-block:28px}
+h2{font:600 28px/1.2 var(--display);margin:0 0 6px}
+.sub{color:var(--muted);margin:0 0 20px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px}
+.btn{font:600 15px var(--body);padding:10px 16px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.modes{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.modes .btn[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+/* flashcard */
+.flash{min-height:200px;display:flex;flex-direction:column;justify-content:center;gap:10px;cursor:pointer;text-align:left;width:100%;font:inherit;color:var(--fg)}
+.flash .term{font:700 clamp(30px,6vw,42px)/1.1 var(--display)}
+.flash .def{font-size:19px}
+.flash .hint{font-size:14px;color:var(--muted)}
+.cat{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--blue)}
+/* quiz */
+.opts{display:grid;gap:10px;margin-top:16px}
+.opt{text-align:left;font:500 16px/1.4 var(--body);padding:14px 16px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--fg);cursor:pointer}
+.opt.right{background:var(--good-bg);border-color:var(--good)}
+.opt.wrong{background:var(--bad-bg);border-color:var(--bad)}
+.qhead{font:600 24px/1.25 var(--display);margin:6px 0 0}
+.meter{height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin-bottom:16px}
+.meter i{display:block;height:100%;background:var(--accent);width:0;transition:width .25s}
+.score{font:700 56px/1 var(--display)}
+/* resources */
+.res{display:grid;gap:12px}
+.res article{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px;min-width:0}
+.res h3{font:600 20px var(--display);margin:0 0 4px}
+.res p{margin:4px 0;color:var(--muted);font-size:15px}
+.pill{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-right:6px;letter-spacing:.04em}
+.pill.free{background:var(--good-bg);color:var(--good)}
+.pill.chk{background:var(--bad-bg);color:var(--bad)}
+.pill.lvl{background:var(--line);color:var(--fg)}
+.res a{color:var(--blue);font-weight:600;overflow-wrap:anywhere}
+.promptbox{font:14px/1.55 ui-monospace,Menlo,Consolas,monospace;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-top:10px;color:var(--fg);overflow-wrap:anywhere}
+.glist{display:grid;gap:10px;margin-top:14px}
+.glist h3{font:600 14px var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin:14px 0 2px}
+.glist .term{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 18px}
+.glist .term b{font:600 20px var(--display);display:block}
+.glist .term span{color:var(--muted);font-size:16px}
+input[type=search]{width:100%;font:500 16px var(--body);padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg)}
+.grp{font:600 14px var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin:22px 0 10px}
+.why{font-size:15px;color:var(--muted);margin:10px 0 0}
+.why b{color:var(--fg)}
+.mock{background:var(--fg);color:var(--bg);border-radius:14px;padding:22px 24px;margin-bottom:6px}
+.mock h3{font:600 22px var(--display);margin:0 0 6px}
+.mock p{margin:0 0 12px;font-size:15px;opacity:.9}
+.mock .promptbox{background:transparent;border-color:rgba(255,255,255,.3);color:inherit}
+.mock .btn.primary{margin-top:2px}
+.notice{background:var(--accent);color:var(--on-accent);border-radius:12px;padding:14px 18px;margin-bottom:6px;font-size:16px}
+select{font:500 15px var(--body);padding:9px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg)}
+@media (prefers-reduced-motion:reduce){.meter i{transition:none}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+<header>
+  <p class="eyebrow">Michigan Sales Club</p>
+  <h1>Sales Tech Workshop Hub</h1>
+  <p>Learn the lingo, practice cold calls with Claude, and find free ways to get hands-on before your first sales job.</p>
+</header>
+<nav role="tablist" aria-label="Hub sections">
+  <button role="tab" id="t-lingo" aria-selected="true" data-tab="lingo">Lingo</button>
+  <button role="tab" id="t-cheat" aria-selected="false" data-tab="cheat">Call cheat sheet</button>
+  <button role="tab" id="t-interview" aria-selected="false" data-tab="interview">Interview prep</button>
+  <button role="tab" id="t-claude" aria-selected="false" data-tab="claude">Practice with Claude</button>
+  <button role="tab" id="t-res" aria-selected="false" data-tab="res">Free resources</button>
+</nav>
+
+<section class="pane" id="p-lingo">
+  <h2>Sales lingo</h2>
+  <p class="sub">Browse every term, flip through flashcards, then test yourself with a quiz.</p>
+  <div class="modes">
+    <button class="btn" id="m-gloss" aria-pressed="true">Glossary</button>
+    <button class="btn" id="m-cards" aria-pressed="false">Flashcards</button>
+    <button class="btn" id="m-quiz" aria-pressed="false">Quiz</button>
+  </div>
+  <div id="gloss">
+    <label for="gsearch" class="sub" style="display:block;margin:0 0 6px">Search terms</label>
+    <input id="gsearch" type="search" placeholder="Try quota, ICP, or cadence" autocomplete="off">
+    <div id="glist" class="glist"></div>
+  </div>
+  <div id="cards" hidden>
+    <button class="card flash" id="flash" aria-live="polite"></button>
+    <div class="row" style="margin-top:14px">
+      <button class="btn" id="prev">Previous</button>
+      <button class="btn primary" id="next">Next</button>
+      <button class="btn" id="shuf">Shuffle</button>
+      <span id="count" class="sub" style="margin:0 0 0 auto"></span>
+    </div>
+  </div>
+  <div id="quiz" hidden></div>
+</section>
+
+<section class="pane" id="p-cheat" hidden>
+  <h2>Cold call cheat sheet</h2>
+  <p class="sub">Copy a line, make it yours, and say it out loud a few times. Replace anything in [brackets]. Reading a script word for word sounds robotic, so use these as a starting point.</p>
+  <h3 class="grp">Openers</h3>
+  <div class="res" id="openers"></div>
+  <h3 class="grp">Objection responses</h3>
+  <div class="res" id="objections"></div>
+</section>
+
+<section class="pane" id="p-interview" hidden>
+  <h2>SDR interview prep</h2>
+  <p class="sub">Common questions with a tip for each. Practice answering out loud, then run a mock interview with Claude.</p>
+  <article class="mock" id="mockcard"></article>
+  <h3 class="grp">Questions to expect</h3>
+  <div class="res" id="questions"></div>
+</section>
+
+<section class="pane" id="p-claude" hidden>
+  <h2>Practice cold calls with Claude</h2>
+  <p class="sub">Copy a prompt, paste it into Claude, and fill in the brackets. Type your lines as if you were on the call. Skip confidential company or customer data, and treat Claude as practice, not the real thing.</p>
+  <div class="res" id="prompts"></div>
+</section>
+
+<section class="pane" id="p-res" hidden>
+  <h2>Get real experience</h2>
+  <p class="sub">Free training grouped by the type of software. Pick one category and start this week.</p>
+  <div class="notice" role="note"><b>Registering?</b> Use your @umich.edu email address, and enter University of Michigan as your company if it asks.</div>
+  <div id="res"></div>
+</section>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+/* tabs */
+function tab(n){
+  for(const k of ['lingo','cheat','interview','claude','res']){
+    $('#p-'+k).hidden=k!==n;
+    const b=document.querySelector('[data-tab="'+k+'"]');b.setAttribute('aria-selected',k===n);
+  }
+}
+document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>tab(b.dataset.tab));
+
+/* lingo */
+const TERMS=[
+ ['SDR / BDR','People','Entry-level rep who finds prospects and books meetings for account executives.'],
+ ['AE','People','Account executive. Runs the sales process and closes the deal.'],
+ ['Quota','People','The revenue or activity target a rep must hit in a period.'],
+ ['Pipeline','Process','All open deals, grouped by stage.'],
+ ['Discovery call','Process','First real conversation to learn the prospect’s problems and priorities.'],
+ ['Cadence','Process','The planned series of calls, emails, and messages over days or weeks.'],
+ ['Handoff','Process','Passing a qualified lead from an SDR to an AE.'],
+ ['Closed-won','Process','A deal that was signed. A deal that was lost is closed-lost.'],
+ ['ICP','Metrics','Ideal customer profile. The type of company most likely to buy and succeed.'],
+ ['MQL / SQL','Metrics','Marketing-qualified or sales-qualified lead. SQLs have been vetted as worth a sales conversation.'],
+ ['ARR','Metrics','Annual recurring revenue from subscriptions.'],
+ ['Win rate','Metrics','Share of deals that end closed-won.'],
+ ['Pipeline coverage','Metrics','Pipeline value compared with quota. Teams use a multiple as a rule of thumb.'],
+ ['Churn','Metrics','Customers who cancel or do not renew.'],
+ ['Intent data','Tech','Signals that a company is researching a topic you sell.'],
+ ['Sequence','Tech','Automated series of emails, calls, and tasks inside a sales engagement tool.'],
+ ['CRM','Tech','Customer relationship management system. The record of every account, contact, and deal.'],
+ ['Conversation intelligence','Tech','Software that records, transcribes, and analyzes sales calls.'],
+ ['Dialer','Tech','Tool that places calls from a list, often automatically logging them.'],
+ ['Sales enablement','Tech','Content and training tools that help reps sell, like playbooks and battlecards.']
+];
+let order=TERMS.map((_,i)=>i),ci=0,shown=false;
+function renderCard(){
+  const t=TERMS[order[ci]];
+  $('#flash').innerHTML=shown
+    ?'<span class="cat">'+esc(t[1])+'</span><span class="term">'+esc(t[0])+'</span><span class="def">'+esc(t[2])+'</span><span class="hint">Tap to flip back</span>'
+    :'<span class="cat">'+esc(t[1])+'</span><span class="term">'+esc(t[0])+'</span><span class="hint">Tap to see the definition</span>';
+  $('#count').textContent=(ci+1)+' of '+TERMS.length;
+}
+$('#flash').onclick=()=>{shown=!shown;renderCard()};
+$('#next').onclick=()=>{ci=(ci+1)%order.length;shown=false;renderCard()};
+$('#prev').onclick=()=>{ci=(ci-1+order.length)%order.length;shown=false;renderCard()};
+$('#shuf').onclick=()=>{order.sort(()=>Math.random()-.5);ci=0;shown=false;renderCard()};
+renderCard();
+
+let qs=[],qi=0,qscore=0,answered=false;
+function shuffle(a){return a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1])}
+function startQuiz(){
+  qs=shuffle(TERMS).slice(0,10).map(t=>{
+    const wrong=shuffle(TERMS.filter(o=>o!==t&&o[1]===t[1]).concat(TERMS.filter(o=>o!==t&&o[1]!==t[1]))).slice(0,3);
+    return {t,opts:shuffle([t].concat(wrong))};
+  });
+  qi=0;qscore=0;answered=false;renderQ();
+}
+function renderQ(){
+  const q$=$('#quiz');
+  if(qi>=qs.length){
+    const msg=qscore>=9?'You can talk like a rep already.':qscore>=6?'Solid. Review the ones you missed and go again.':'Good start. Flip through the flashcards and retry.';
+    q$.innerHTML='<div class="card"><p class="cat">Final score</p><div class="score">'+qscore+' / '+qs.length+'</div><p>'+msg+'</p><button class="btn primary" id="again">Try again</button></div>';
+    $('#again').onclick=startQuiz;return;
+  }
+  const q=qs[qi];
+  q$.innerHTML='<div class="meter"><i style="width:'+(qi/qs.length*100)+'%"></i></div><div class="card"><p class="cat">Question '+(qi+1)+' of '+qs.length+'</p><p class="qhead">Which definition matches “'+esc(q.t[0])+'”?</p><div class="opts">'+
+   q.opts.map((o,i)=>'<button class="opt" data-i="'+i+'">'+esc(o[2])+'</button>').join('')+'</div><div class="row" style="margin-top:16px"><button class="btn primary" id="qnext" hidden>'+(qi===qs.length-1?'See score':'Next question')+'</button></div></div>';
+  answered=false;
+  q$.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    if(answered)return;answered=true;
+    const pick=q.opts[+b.dataset.i];
+    if(pick===q.t){qscore++;b.classList.add('right')}else{b.classList.add('wrong');
+      q$.querySelectorAll('.opt').forEach(x=>{if(q.opts[+x.dataset.i]===q.t)x.classList.add('right')})}
+    $('#qnext').hidden=false;$('#qnext').focus();
+  });
+  $('#qnext').onclick=()=>{qi++;renderQ()};
+}
+function renderGloss(){
+  const q=$('#gsearch').value.trim().toLowerCase();
+  const rows=TERMS.filter(t=>!q||(t[0]+' '+t[2]).toLowerCase().includes(q));
+  let html='',cat='';
+  for(const t of rows){
+    if(t[1]!==cat){cat=t[1];html+='<h3>'+esc(cat)+'</h3>'}
+    html+='<div class="term"><b>'+esc(t[0])+'</b><span>'+esc(t[2])+'</span></div>';
+  }
+  $('#glist').innerHTML=html||'<p class="sub">No terms match that search.</p>';
+}
+$('#gsearch').oninput=renderGloss;renderGloss();
+function mode(m){
+  $('#gloss').hidden=m!=='gloss';$('#cards').hidden=m!=='cards';$('#quiz').hidden=m!=='quiz';
+  for(const k of ['gloss','cards','quiz'])$('#m-'+k).setAttribute('aria-pressed',m===k);
+  if(m==='quiz'&&!qs.length)startQuiz();
+}
+$('#m-gloss').onclick=()=>mode('gloss');$('#m-cards').onclick=()=>mode('cards');$('#m-quiz').onclick=()=>mode('quiz');
+
+
+
+/* shared copy helper */
+function copyInto(btn,text,box,msg){
+  const done=()=>{msg.textContent='Copied';setTimeout(()=>{msg.textContent=''},2000)};
+  const fail=()=>{const r=document.createRange();r.selectNodeContents(box);const s=getSelection();s.removeAllRanges();s.addRange(r);msg.textContent='Press Ctrl+C or Cmd+C to copy'};
+  try{navigator.clipboard.writeText(text).then(done,fail)}catch(e){fail()}
+}
+function cardHTML(prefix,i,r){
+  return '<article><h3>'+esc(r.t)+'</h3>'+(r.d?'<p>'+esc(r.d)+'</p>':'')+'<div class="promptbox" id="'+prefix+'b'+i+'">'+esc(r.p)+'</div>'+(r.w?'<p class="why"><b>Why it works:</b> '+esc(r.w)+'</p>':'')+'<div class="row" style="margin-top:10px"><button class="btn primary" data-p="'+prefix+'" data-i="'+i+'">Copy</button><span class="sub" id="'+prefix+'m'+i+'" style="margin:0" aria-live="polite"></span></div></article>';
+}
+function wireCopy(root,map){
+  root.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{
+    const p=b.dataset.p,i=+b.dataset.i;
+    copyInto(b,map[p][i].p,$('#'+p+'b'+i),$('#'+p+'m'+i));
+  });
+}
+const OPENERS=[
+ {t:'Permission opener',d:'Honest and low pressure. Works when you are calling cold.',p:'Hi [Name], this is [your name] from [company]. I know I am calling out of the blue. Do you have 30 seconds for me to tell you why I called, and then you can decide whether it is worth continuing?',w:'It admits the interruption and gives the buyer control, which lowers their guard.'},
+ {t:'Trigger opener',d:'Use when you found a recent event, like a hire, launch, or expansion.',p:'Hi [Name], I saw that [company] just [opened a new location / hired a new VP / launched a product]. Teams in that spot often run into [problem]. Is that something on your radar right now?',w:'It shows you did research and ties the call to something happening now.'},
+ {t:'Peer opener',d:'Good when you do not have a specific trigger.',p:'Hi [Name], I work with [job titles] at companies like [similar company] who are trying to [outcome]. I am curious how you are handling that today.',w:'Naming similar companies builds credibility, and the question starts a conversation instead of a pitch.'},
+ {t:'Referral opener',d:'Use when someone pointed you to this person.',p:'Hi [Name], [referrer] suggested I reach out. They mentioned you own [area] at [company]. Do you have a minute so I can explain why they thought we should talk?',w:'A familiar name earns attention in the first five seconds.'},
+ {t:'Voicemail',d:'Keep it under 25 seconds.',p:'Hi [Name], this is [your name] from [company]. I am reaching out because [one-sentence reason that matters to them]. I will send a short email as well. You can reach me at [phone number]. Again, that is [phone number]. Thanks.',w:'One clear reason plus your number said twice. Do not pitch the whole product.'}
+];
+const OBJECTIONS=[
+ {t:'“Send me an email.”',d:'Often a polite brush-off. Try to learn something before you agree.',p:'Happy to. So I send something useful and not generic, what is the main thing on your plate around [topic] right now?',w:'You still agree, but you get one real fact to personalize the email.'},
+ {t:'“We already use a competitor.”',d:'Do not argue or ask them to switch.',p:'That makes sense, a lot of [similar companies] do. I am not asking you to switch. Out of curiosity, what is working well, and is there anything you wish it did better?',w:'It respects their choice and opens a conversation about gaps.'},
+ {t:'“I am not interested.”',d:'Acknowledge it, then ask one low-pressure question.',p:'Fair enough, I did catch you out of the blue. Can I ask what makes it not a fit right now, so I do not waste your time again?',w:'It keeps you honest and sometimes reveals the real objection.'},
+ {t:'“We do not have the budget.”',d:'Find out whether it is timing or priority.',p:'Understood. Is that for this quarter, or is this just not a priority at all? If it were a priority, what would it need to deliver to be worth it?',w:'It separates a timing issue from a no, and shows you what success looks like to them.'},
+ {t:'“I am busy right now.”',d:'This is a gift. Ask for a specific time.',p:'No problem at all. Would later this week be better? I only need 10 minutes. How is Thursday morning or Friday afternoon?',w:'A specific choice of times is easier to say yes to than an open question.'},
+ {t:'“Who is this? How did you get my number?”',d:'Stay calm and brief.',p:'Fair question. I am [your name] from [company]. We work with [type of company], and your name came up because you lead [area]. I will be quick. Is now a bad time?',w:'A direct answer builds trust and moves the call forward.'}
+];
+const QUESTIONS=[
+ {t:'Why sales?',d:'',p:'Tell me why you want a career in sales.',w:'Tell a short true story about a time you persuaded or helped someone, then connect it to what you like about the job.'},
+ {t:'Why this company?',d:'',p:'Why do you want to work here, and why this product?',w:'Name something specific you learned about the product, customers, or team. Generic praise sounds rehearsed.'},
+ {t:'Research a prospect',d:'',p:'Walk me through how you would research a prospect before a cold call.',w:'Mention the company website, LinkedIn, recent news, and the buyer’s role. End with how you turn it into one personalized opener.'},
+ {t:'Handling rejection',d:'',p:'Tell me about a time you faced rejection. What did you do next?',w:'Use the STAR format: situation, task, action, result. Spend most of your time on what you did and what you learned.'},
+ {t:'Sell me something',d:'',p:'Sell me this pen. Or pick any product and sell it to me in 60 seconds.',w:'Ask discovery questions first about how they use it and what matters to them. Then connect features to what they said.'},
+ {t:'Tools you know',d:'',p:'What sales tools or software have you used?',w:'Be honest. Mention certifications like HubSpot or Trailhead, and show you understand what each category of tool does.'},
+ {t:'Pressure and goals',d:'',p:'How do you stay motivated when you are behind on your numbers?',w:'Talk about controlling activity, asking for feedback, and reviewing calls. Avoid blaming leads or luck.'},
+ {t:'Your questions for them',d:'',p:'What questions do you have for me?',w:'Ask about ramp time, coaching, the tools they use, and what top reps do differently. Skip questions you could find on the website.'}
+];
+const MOCK='You are a sales hiring manager at [company] interviewing me for an SDR role. Ask me one question at a time, covering why I want sales, handling rejection, how I research a prospect, a 60-second sell, and the tools I know. After each answer, give two sentences of feedback and one stronger way to say it, then ask the next question. At the end, score me from 1 to 5 on structure, specificity, and confidence.';
+const MAPS={op:OPENERS,ob:OBJECTIONS,qu:QUESTIONS};
+function renderCheat(){
+  $('#openers').innerHTML=OPENERS.map((r,i)=>cardHTML('op',i,r)).join('');
+  $('#objections').innerHTML=OBJECTIONS.map((r,i)=>cardHTML('ob',i,r)).join('');
+  wireCopy($('#openers'),MAPS);wireCopy($('#objections'),MAPS);
+}
+function renderInterview(){
+  $('#questions').innerHTML=QUESTIONS.map((r,i)=>'<article><h3>'+esc(r.t)+'</h3><p style="color:var(--fg);font-size:16px">'+esc(r.p)+'</p><p class="why"><b>Tip:</b> '+esc(r.w)+'</p></article>').join('');
+  $('#mockcard').innerHTML='<h3>Run a mock interview with Claude</h3><p>Copy this prompt, paste it into Claude, and fill in the company. Answer out loud or type, then read the feedback.</p><div class="promptbox" id="mockbox">'+esc(MOCK)+'</div><div class="row" style="margin-top:10px"><button class="btn primary" id="mockcopy">Copy mock interview prompt</button><span id="mockmsg" style="font-size:14px" aria-live="polite"></span></div>';
+  $('#mockcopy').onclick=()=>copyInto($('#mockcopy'),MOCK,$('#mockbox'),$('#mockmsg'));
+}
+renderCheat();renderInterview();
+
+/* claude prompts */
+const PROMPTS=[
+ {t:'Cold call role-play',d:'Run a live call against a tough buyer, then get scored.',p:'You are a skeptical VP of Operations at a 200-person logistics company. I am an SDR at [my company] selling [my product]. Role-play a cold call with me. Stay in character, raise realistic objections, and do not make it easy. Wait for my reply after each line. When I type STOP, score my opener, objection handling, and next-step ask from 1 to 5, and show one rewrite.'},
+ {t:'Objection drill',d:'Get hit with one objection at a time and practice your response.',p:'Act as a busy buyer. I will pitch [my product] in one sentence. Respond with one realistic objection at a time, such as "send me an email", "we already use a competitor", or "no budget". After each of my replies, tell me in two sentences how it landed and give a stronger version.'},
+ {t:'Discovery call practice',d:'Practice asking questions instead of pitching.',p:'You are the head of sales at a [size] [industry] company. I am a rep running a discovery call for [my product]. Answer my questions in character, and reveal real problems only when I ask good open-ended questions. When I type STOP, tell me which questions worked, which were leading or closed, and what I missed.'},
+ {t:'Follow-up email review',d:'Tighten the message you send after a call.',p:'Here is a follow-up email I plan to send after a discovery call with [buyer role]: [paste email without names or confidential details]. Critique it for clarity, length, and a clear next step. Then rewrite it in under 100 words.'},
+ {t:'Interview prep for SDR roles',d:'Rehearse interview answers and role-play questions.',p:'You are a sales hiring manager at [company] interviewing me for an SDR role. Ask me one question at a time, including a cold-call role-play and a question about the sales tools I know. After each answer, give brief feedback and then ask the next question.'}
+];
+function renderPrompts(){
+  $('#prompts').innerHTML=PROMPTS.map((r,i)=>'<article><h3>'+esc(r.t)+'</h3><p>'+esc(r.d)+'</p><div class="promptbox" id="pb'+i+'">'+esc(r.p)+'</div><div class="row" style="margin-top:10px"><button class="btn primary" data-c="'+i+'">Copy prompt</button><span class="sub" id="cm'+i+'" style="margin:0" aria-live="polite"></span></div></article>').join('');
+  $('#prompts').querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.c,box=$('#pb'+i),msg=$('#cm'+i);
+    const sel=()=>{const r=document.createRange();r.selectNodeContents(box);const s=getSelection();s.removeAllRanges();s.addRange(r)};
+    const done=()=>{msg.textContent='Copied';setTimeout(()=>{msg.textContent=''},2000)};
+    const fail=()=>{sel();msg.textContent='Press Ctrl+C or Cmd+C to copy'};
+    try{navigator.clipboard.writeText(PROMPTS[i].p).then(done,fail)}catch(e){fail()}
+  });
+}
+renderPrompts();
+
+/* resources */
+const RES=[
+ {c:'CRM',t:'Salesforce Trailhead: Sales Career Path',lv:'Beginner',d:'Free learning platform with trails for Business Development Rep, Account Executive, Sales Leader, and Sales Operations. Start with the BDR trail.',u:'https://www.salesforce.com/blog/sales-career-path-trailblazer-ecosystem/',ul:'Read the career path overview'},
+ {c:'CRM',t:'Trailhead: Create a Trailhead Playground',lv:'Beginner',d:'A practice Salesforce environment you can click around in while you finish the trails.',u:'https://trailhead.salesforce.com/content/learn/modules/trailhead_playground_management/create-a-trailhead-playground',ul:'Open the module'},
+ {c:'CRM',t:'HubSpot Academy: Sales Hub Software certification',lv:'Beginner',d:'Free certification course, about 1 hour 45 minutes across 6 lessons, ending in a multiple-choice exam. Covers leads, outreach, deals, and sales reporting.',u:'https://academy.hubspot.com/courses/hubspot-sales-software',ul:'Open the course'},
+ {c:'Prospecting data',t:'Apollo Academy',lv:'Beginner',d:'Foundational courses with shareable credentials, for example Workflows Basics on automating outreach. Search for \u201cApollo Academy\u201d to find the current catalog.',u:'',ul:''},
+ {c:'Sales engagement',t:'Salesloft Academy: Cadence Fundamentals',lv:'Beginner',d:'A course the club recommends. It covers how cadences work, which ties directly to the sequence and cadence lingo.',u:'https://academy.salesloft.com/cadence-fundamentals/223285/scorm/3na6j69r5wlsz',ul:'Open the course'},
+ {c:'Sales engagement',t:'Salesloft Academy',lv:'Intermediate',d:'Role-based learning for AEs, SDRs, managers, and admins.',u:'https://academy.salesloft.com',ul:'Open Salesloft Academy'},
+ {c:'Sales engagement',t:'Outreach University and certification',lv:'Intermediate',d:'Training portal plus a certification program that ends in a proctored two-hour exam.',u:'https://www.outreach.ai/resources/blog/unlock-revenue-with-new-outreach-university-certification-program',ul:'Read the program announcement'}
+];
+const CATORDER=[['CRM','CRM: where every deal lives'],['Prospecting data','Prospecting data: finding the right people'],['Sales engagement','Sales engagement: outreach and cadences']];
+function renderRes(){
+  $('#res').innerHTML=CATORDER.map(([k,h])=>'<h3 class="grp">'+esc(h)+'</h3><div class="res">'+RES.filter(r=>r.c===k).map(r=>'<article><h3>'+esc(r.t)+'</h3><div><span class="pill lvl">'+esc(r.lv)+'</span></div><p>'+esc(r.d)+'</p>'+(r.u?'<a href="'+r.u+'" target="_blank" rel="noopener">'+esc(r.ul)+'</a>':'')+'</article>').join('')+'</div>').join('');
+}
+renderRes();
+</script>
+
+</html>
